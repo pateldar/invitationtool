@@ -11,14 +11,16 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blush:  #f5ebe0;
-      --rose:   #c9a98e;
-      --gold:   #b8860b;
-      --deep:   #4a3728;
-      --text:   #3d2e22;
-      --light:  #faf6f1;
-      --muted:  #8a7060;
-      --border: #e8d8c8;
+      --blush:   #f5ebe0;
+      --rose:    #c9a98e;
+      --rose-dk: #a8876d;
+      --gold:    #b8860b;
+      --deep:    #4a3728;
+      --text:    #3d2e22;
+      --light:   #faf6f1;
+      --muted:   #8a7060;
+      --border:  #e8d8c8;
+      --shadow:  rgba(74,55,40,0.08);
     }
 
     html, body {
@@ -27,13 +29,15 @@
       color: var(--text);
       font-family: 'Jost', sans-serif;
       font-weight: 300;
+      line-height: 1.6;
     }
 
+    /* Decorative page border */
     body::before {
       content: '';
       position: fixed;
       inset: 10px;
-      border: 1px solid rgba(201,169,142,0.4);
+      border: 1px solid rgba(201,169,142,0.35);
       pointer-events: none;
       z-index: 100;
     }
@@ -52,18 +56,19 @@
     #invite-wrap { display: none; }
 
     .spinner {
-      width: 36px; height: 36px;
+      width: 32px; height: 32px;
       border: 2px solid var(--border);
       border-top-color: var(--rose);
       border-radius: 50%;
-      animation: spin 0.9s linear infinite;
+      animation: spin 0.85s linear infinite;
       margin-bottom: 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .error-icon {
-      font-size: 2.5rem;
-      margin-bottom: 16px;
+      color: var(--rose);
+      margin-bottom: 20px;
+      opacity: 0.7;
     }
 
     /* ---- Page layout ---- */
@@ -80,20 +85,22 @@
     }
 
     .eyebrow {
-      font-size: 0.72rem;
-      letter-spacing: 0.32em;
+      font-size: 0.68rem;
+      letter-spacing: 0.38em;
       text-transform: uppercase;
       color: var(--rose);
       margin-bottom: 20px;
+      font-weight: 400;
     }
 
     .couple-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.4rem, 7vw, 4rem);
+      font-size: clamp(2.8rem, 8vw, 4.5rem);
       font-weight: 300;
       color: var(--deep);
-      line-height: 1.1;
-      margin-bottom: 16px;
+      line-height: 1.08;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
     }
 
     .couple-title em {
@@ -103,18 +110,18 @@
 
     .greeting {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
       font-style: italic;
       color: var(--muted);
-      margin-top: 16px;
-      line-height: 1.5;
+      line-height: 1.65;
     }
 
+    /* ---- Divider ---- */
     .divider {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin: 32px 0;
+      gap: 14px;
+      margin: 40px 0;
       color: var(--rose);
       opacity: 0.5;
     }
@@ -124,99 +131,99 @@
       height: 1px;
       background: var(--rose);
     }
+    .divider svg { flex-shrink: 0; }
 
-    /* ---- Event card ---- */
-    .events-section h2 {
+    /* ---- Section headings ---- */
+    .section-heading {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       font-weight: 400;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--deep);
       margin-bottom: 20px;
       text-align: center;
     }
 
+    /* ---- Event card ---- */
     .event-list {
       display: flex;
       flex-direction: column;
       gap: 16px;
-      margin-bottom: 48px;
+      margin-bottom: 8px;
     }
 
     .event-card {
       background: white;
       border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 24px 28px;
-      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px var(--shadow);
     }
 
-    .event-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--rose);
-      border-radius: 4px 0 0 4px;
+    .event-card-accent {
+      height: 3px;
+      background: linear-gradient(90deg, var(--rose) 0%, #e8c4a4 100%);
+    }
+
+    .event-card-body {
+      padding: 24px 28px 22px;
     }
 
     .event-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       font-weight: 500;
       color: var(--deep);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      line-height: 1.2;
     }
 
     .event-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px 24px;
-      font-size: 0.82rem;
-      letter-spacing: 0.05em;
+      gap: 10px 22px;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
       color: var(--muted);
-      margin-bottom: 8px;
     }
 
-    .event-meta span::before {
-      margin-right: 5px;
+    .event-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .event-meta-item svg {
+      flex-shrink: 0;
+      opacity: 0.7;
     }
 
     .event-desc {
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       color: var(--muted);
       line-height: 1.6;
-      margin-top: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
     }
 
     /* ---- RSVP form ---- */
-    .rsvp-section h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
-      font-weight: 400;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--deep);
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
     .rsvp-subtitle {
       text-align: center;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--muted);
       margin-bottom: 28px;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
     }
 
-    /* Per-event RSVP block */
     .rsvp-event-block {
       background: white;
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 10px;
       padding: 24px 28px;
       margin-bottom: 16px;
+      box-shadow: 0 2px 12px var(--shadow);
     }
 
     .rsvp-event-name {
@@ -224,7 +231,7 @@
       font-size: 1.15rem;
       font-weight: 500;
       color: var(--deep);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     /* Radio buttons styled as choice cards */
@@ -250,13 +257,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 14px 8px;
+      gap: 8px;
+      padding: 16px 8px 14px;
       border: 1.5px solid var(--border);
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.18s ease;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
+      transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
       text-align: center;
@@ -265,49 +273,56 @@
     }
 
     .rsvp-choice label .choice-icon {
-      font-size: 1.4rem;
-      margin-bottom: 6px;
+      transition: color 0.18s, transform 0.18s;
     }
 
     .rsvp-choice input:checked + label {
       border-color: var(--rose);
       background: var(--blush);
       color: var(--deep);
+      box-shadow: 0 2px 8px rgba(201,169,142,0.22);
+    }
+
+    .rsvp-choice input:checked + label .choice-icon {
+      color: var(--rose);
+      transform: scale(1.1);
     }
 
     .rsvp-choice label:hover {
       border-color: var(--rose);
-      background: rgba(201,169,142,0.08);
+      background: rgba(201,169,142,0.07);
     }
 
-    /* Going count */
+    /* Going count control */
     .attending-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-top: 4px;
+      gap: 14px;
+      margin-top: 6px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
     }
 
     .attending-row label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      letter-spacing: 0.05em;
-      white-space: nowrap;
+      letter-spacing: 0.04em;
+      flex: 1;
     }
 
     .qty-control {
       display: flex;
       align-items: center;
-      gap: 0;
       border: 1.5px solid var(--border);
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
     .qty-btn {
       background: none;
       border: none;
-      width: 34px; height: 34px;
+      width: 36px; height: 36px;
       font-size: 1.1rem;
       cursor: pointer;
       color: var(--rose);
@@ -315,34 +330,44 @@
       align-items: center;
       justify-content: center;
       transition: background 0.15s;
+      flex-shrink: 0;
     }
 
     .qty-btn:hover { background: var(--blush); }
 
     .qty-val {
-      width: 36px;
+      width: 38px;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      font-weight: 400;
       color: var(--deep);
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      height: 34px;
-      line-height: 34px;
+      height: 36px;
+      line-height: 36px;
       user-select: none;
     }
 
-    /* ---- Guest name field ---- */
+    .qty-max {
+      font-size: 0.72rem;
+      color: var(--muted);
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    /* ---- Field groups ---- */
     .field-group {
       margin-bottom: 20px;
     }
 
     .field-group label {
       display: block;
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 8px;
+      font-weight: 400;
     }
 
     .field-group input,
@@ -350,27 +375,28 @@
       width: 100%;
       padding: 12px 16px;
       border: 1.5px solid var(--border);
-      border-radius: 4px;
+      border-radius: 8px;
       font-family: 'Jost', sans-serif;
       font-size: 0.9rem;
       font-weight: 300;
       color: var(--text);
       background: white;
       outline: none;
-      transition: border-color 0.18s;
+      transition: border-color 0.18s, box-shadow 0.18s;
     }
 
     .field-group input:focus,
     .field-group textarea:focus {
       border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(201,169,142,0.14);
     }
 
     .field-group textarea {
       resize: vertical;
-      min-height: 80px;
+      min-height: 90px;
     }
 
-    /* ---- Submit ---- */
+    /* ---- Submit button ---- */
     .submit-btn {
       display: block;
       width: 100%;
@@ -378,55 +404,68 @@
       background: var(--deep);
       color: var(--blush);
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       font-family: 'Jost', sans-serif;
-      font-size: 0.8rem;
-      letter-spacing: 0.25em;
+      font-size: 0.76rem;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
       margin-top: 28px;
+      box-shadow: 0 4px 16px rgba(74,55,40,0.18);
     }
 
-    .submit-btn:hover { background: var(--rose); }
+    .submit-btn:hover {
+      background: var(--rose-dk);
+      box-shadow: 0 6px 20px rgba(74,55,40,0.22);
+    }
     .submit-btn:active { transform: scale(0.99); }
-    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .submit-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
 
     /* ---- Success state ---- */
     #success-state {
       display: none;
       text-align: center;
-      padding: 64px 28px;
+      padding: 80px 28px;
       max-width: 540px;
       margin: 0 auto;
     }
 
     .success-icon {
-      font-size: 3rem;
-      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+      color: var(--rose);
     }
 
     .success-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem;
+      font-size: clamp(2rem, 5vw, 2.8rem);
       color: var(--deep);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      font-weight: 300;
     }
 
     .success-body {
-      font-size: 0.9rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-style: italic;
       color: var(--muted);
       line-height: 1.7;
     }
 
-    /* ---- Error notice ---- */
+    /* ---- Form error ---- */
     .form-error {
       background: #fdf0f0;
       border: 1px solid #f0c0b0;
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 12px 16px;
       font-size: 0.82rem;
-      color: #a04030;
+      color: #8b3a3a;
       margin-top: 16px;
       display: none;
     }
@@ -435,18 +474,19 @@
     footer {
       text-align: center;
       padding: 24px;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--rose);
-      opacity: 0.5;
+      opacity: 0.45;
     }
 
     @media (max-width: 480px) {
-      .rsvp-choices { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-      .rsvp-choice label { padding: 10px 4px; font-size: 0.7rem; }
-      .event-card, .rsvp-event-block { padding: 18px 16px; }
+      .rsvp-choices { gap: 7px; }
+      .rsvp-choice label { padding: 12px 4px 10px; font-size: 0.68rem; gap: 6px; }
+      .event-card-body, .rsvp-event-block { padding: 18px 18px; }
       .page { padding: 44px 16px 60px; }
+      .attending-row { flex-wrap: wrap; gap: 10px; }
     }
   </style>
 </head>
@@ -455,14 +495,19 @@
   <!-- Loading -->
   <div id="loading-state">
     <div class="spinner"></div>
-    <p style="font-size:0.82rem;letter-spacing:0.1em;color:var(--muted)">Loading your invitation…</p>
+    <p style="font-size:0.8rem;letter-spacing:0.12em;color:var(--muted)">Loading your invitation…</p>
   </div>
 
   <!-- Error -->
   <div id="error-state" style="display:none">
-    <div class="error-icon">✉️</div>
-    <p style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--deep);margin-bottom:10px">Invitation Not Found</p>
-    <p style="font-size:0.85rem;color:var(--muted);max-width:340px;line-height:1.6" id="error-msg">
+    <div class="error-icon">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--deep);margin-bottom:10px;font-weight:300">Invitation Not Found</p>
+    <p style="font-size:0.85rem;color:var(--muted);max-width:340px;line-height:1.7" id="error-msg">
       We couldn't find your invitation. Please check the link you received or contact us directly.
     </p>
   </div>
@@ -479,16 +524,20 @@
 
       <!-- Events -->
       <section class="events-section" id="events-section">
-        <div class="divider">✦</div>
-        <h2>The Celebration</h2>
+        <div class="divider">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h2 class="section-heading">The Celebration</h2>
         <div class="event-list" id="event-list"></div>
       </section>
 
       <!-- RSVP form -->
       <section class="rsvp-section" id="rsvp-section">
-        <div class="divider">✦</div>
-        <h2>Kindly Reply</h2>
-        <p class="rsvp-subtitle" id="rsvp-subtitle">Please RSVP for each event below</p>
+        <div class="divider">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h2 class="section-heading">Kindly Reply</h2>
+        <p class="rsvp-subtitle" id="rsvp-subtitle">Please let us know for each event below</p>
 
         <form id="rsvp-form" novalidate>
           <div class="field-group">
@@ -500,7 +549,7 @@
           <div id="rsvp-events-container"></div>
 
           <div class="field-group" style="margin-top:20px">
-            <label for="guest-message">A note for the couple <span style="opacity:0.6">(optional)</span></label>
+            <label for="guest-message">A note for the couple <span style="opacity:0.55;font-size:0.65rem">(optional)</span></label>
             <textarea id="guest-message" placeholder="Share your well wishes…"></textarea>
           </div>
 
@@ -515,7 +564,11 @@
 
   <!-- Success -->
   <div id="success-state">
-    <div class="success-icon">🌸</div>
+    <div class="success-icon">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </div>
     <h2 class="success-title">Thank you!</h2>
     <p class="success-body" id="success-msg">Your RSVP has been received. We can't wait to celebrate with you.</p>
   </div>
@@ -525,6 +578,16 @@
 // CONFIG — paste your Apps Script Web App URL here
 // ============================================================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtFMrnSsL354ESR_RsNWeJvq4N0E0Xh5OXFJ8w_dINDuqpuHr_52RXbQ-CWvz1O7lz/exec";
+
+// SVG icons (inline, for use in JS-generated HTML)
+const ICONS = {
+  calendar: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  clock:    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  pin:      `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  check:    `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+  maybe:    `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  xmark:    `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+};
 
 // ============================================================
 // State
@@ -583,22 +646,30 @@ function renderInvite() {
   const rsvpContainer = document.getElementById('rsvp-events-container');
 
   if (events.length === 0) {
-    eventList.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:0.85rem">Event details coming soon — stay tuned!</p>';
+    eventList.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:0.85rem;font-style:italic">Event details coming soon — stay tuned!</p>';
     document.getElementById('rsvp-section').style.display = 'none';
   } else {
     events.forEach(ev => {
       // Event display card
       const card = document.createElement('div');
       card.className = 'event-card';
+
+      const metaItems = [];
+      if (ev.date) metaItems.push(`<span class="event-meta-item">${ICONS.calendar} ${escHtml(formatDate(ev.date))}</span>`);
+      if (ev.time) metaItems.push(`<span class="event-meta-item">${ICONS.clock} ${escHtml(ev.time)}</span>`);
+      if (ev.venue) metaItems.push(`<span class="event-meta-item">${ICONS.pin} ${escHtml(ev.venue)}</span>`);
+
+      const extraLines = [];
+      if (ev.address) extraLines.push(escHtml(ev.address));
+      if (ev.description) extraLines.push(escHtml(ev.description));
+
       card.innerHTML = `
-        <div class="event-name">${escHtml(ev.name)}</div>
-        <div class="event-meta">
-          ${ev.date ? `<span>📅 ${escHtml(formatDate(ev.date))}</span>` : ''}
-          ${ev.time ? `<span>🕐 ${escHtml(ev.time)}</span>` : ''}
-          ${ev.venue ? `<span>📍 ${escHtml(ev.venue)}</span>` : ''}
+        <div class="event-card-accent"></div>
+        <div class="event-card-body">
+          <div class="event-name">${escHtml(ev.name)}</div>
+          ${metaItems.length ? `<div class="event-meta">${metaItems.join('')}</div>` : ''}
+          ${extraLines.length ? `<div class="event-desc">${extraLines.join('<br>')}</div>` : ''}
         </div>
-        ${ev.address ? `<div class="event-desc">${escHtml(ev.address)}</div>` : ''}
-        ${ev.description ? `<div class="event-desc" style="margin-top:8px">${escHtml(ev.description)}</div>` : ''}
       `;
       eventList.appendChild(card);
 
@@ -615,19 +686,19 @@ function renderInvite() {
       block.innerHTML = `
         <div class="rsvp-event-name">${escHtml(ev.name)}</div>
         <div class="rsvp-choices">
-          ${rsvpChoice(ev.id, 'going',     '🎉', 'Going',    initStatus === 'going')}
-          ${rsvpChoice(ev.id, 'maybe',     '🤔', 'Maybe',    initStatus === 'maybe')}
-          ${rsvpChoice(ev.id, 'not_going', '😔', "Can't Go", initStatus === 'not_going')}
+          ${rsvpChoice(ev.id, 'going',     ICONS.check, 'Going',    initStatus === 'going')}
+          ${rsvpChoice(ev.id, 'maybe',     ICONS.maybe, 'Maybe',    initStatus === 'maybe')}
+          ${rsvpChoice(ev.id, 'not_going', ICONS.xmark, "Can't Go", initStatus === 'not_going')}
         </div>
         ${maxGuests > 1 ? `
         <div class="attending-row" id="count-row-${ev.id}" style="display:${(initStatus === 'going' || initStatus === 'maybe') ? 'flex' : 'none'}">
-          <label>How many guests from your party?</label>
+          <label>How many from your party?</label>
           <div class="qty-control">
             <button type="button" class="qty-btn" onclick="changeCount('${ev.id}',-1)">−</button>
             <div class="qty-val" id="count-val-${ev.id}">${initCount}</div>
             <button type="button" class="qty-btn" onclick="changeCount('${ev.id}',1)">+</button>
           </div>
-          <span style="font-size:0.75rem;color:var(--muted)">(up to ${maxGuests})</span>
+          <span class="qty-max">of ${maxGuests}</span>
         </div>` : ''}
       `;
       rsvpContainer.appendChild(block);
@@ -649,13 +720,13 @@ function renderInvite() {
   document.getElementById('invite-wrap').style.display   = 'block';
 }
 
-function rsvpChoice(eventId, value, icon, label, checked) {
+function rsvpChoice(eventId, value, iconSvg, label, checked) {
   const id = `rsvp-${eventId}-${value}`;
   return `
     <div class="rsvp-choice">
       <input type="radio" name="rsvp-${eventId}" id="${id}" value="${value}" ${checked ? 'checked' : ''}>
       <label for="${id}">
-        <span class="choice-icon">${icon}</span>
+        <span class="choice-icon">${iconSvg}</span>
         ${label}
       </label>
     </div>`;
@@ -774,10 +845,9 @@ function showError(msg) {
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
-  // Extract just YYYY-MM-DD to avoid timezone shifts
   const datePart = String(dateStr).slice(0, 10);
   const [year, month, day] = datePart.split('-').map(Number);
-  if (!year || !month || !day) return dateStr; // fallback for freeform text
+  if (!year || !month || !day) return dateStr;
   const d = new Date(year, month - 1, day);
   return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
