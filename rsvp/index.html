@@ -715,11 +715,13 @@ async function submitRSVP() {
   btn.disabled = true;
   btn.textContent = 'Sending…';
 
+  const message = document.getElementById('guest-message').value.trim();
   const rsvps = events.map(ev => ({
     eventId:        ev.id,
     eventName:      ev.name,
     status:         rsvpState[ev.id].status,
     attendingCount: rsvpState[ev.id].status === 'going' ? (rsvpState[ev.id].count || 1) : 0,
+    message,
   }));
 
   try {
