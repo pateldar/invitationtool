@@ -1141,10 +1141,13 @@ function escHtml(str) {
 function escAttr(str) { return (str || '').replace(/'/g, "\\'"); }
 
 async function apiFetch(path, opts = {}) {
+  const isPost = opts.method === 'POST';
+  // GET requests must not have Content-Type (triggers CORS preflight that Apps Script can't handle)
+  // POST requests use text/plain (simple request, no preflight) — Apps Script still receives the body
   const res = await fetch(SCRIPT_URL + path, {
     ...opts,
     redirect: 'follow',
-    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    headers: isPost ? { 'Content-Type': 'text/plain;charset=utf-8' } : {},
   });
   return res.json();
 }

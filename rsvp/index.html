@@ -777,11 +777,12 @@ function escHtml(str) {
 }
 
 async function apiFetch(path, opts = {}) {
+  const isPost = opts.method === 'POST';
   const url = SCRIPT_URL + path;
   const res = await fetch(url, {
     ...opts,
     redirect: 'follow',
-    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    headers: isPost ? { 'Content-Type': 'text/plain;charset=utf-8' } : {},
   });
   return res.json();
 }
