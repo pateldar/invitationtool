@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bhumika &amp; Darshil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:   #f5ebe0;
+      --rose:    #c9a98e;
+      --gold:    #b8860b;
+      --deep:    #4a3728;
+      --text:    #3d2e22;
+      --light:   #faf6f1;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--light);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+    }
+
+    /* ---- Decorative border ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 12px;
+      border: 1px solid var(--rose);
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.5;
+    }
+
+    /* ---- Hero ---- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(201,169,142,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(201,169,142,0.10) 0%, transparent 60%);
+    }
+
+    .ornament {
+      font-size: 1.1rem;
+      letter-spacing: 0.35em;
+      color: var(--rose);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 400;
+    }
+
+    .couple-names {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 9vw, 6.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--deep);
+      letter-spacing: 0.02em;
+    }
+
+    .couple-names .ampersand {
+      font-style: italic;
+      color: var(--rose);
+      font-size: 0.85em;
+    }
+
+    .divider {
+      width: 80px;
+      height: 1px;
+      background: var(--rose);
+      margin: 32px auto;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: '✦';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--rose);
+      font-size: 0.6rem;
+      background: var(--light);
+      padding: 0 6px;
+    }
+    .divider::before { left: -8px; }
+    .divider::after  { right: -8px; }
+
+    .tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-style: italic;
+      color: var(--rose);
+      margin-bottom: 48px;
+      font-weight: 300;
+    }
+
+    .cta-note {
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rose);
+      opacity: 0.75;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <p class="ornament">We're celebrating</p>
+
+    <h1 class="couple-names">
+      Bhumika<br>
+      <span class="ampersand">&amp;</span><br>
+      Darshil
+    </h1>
+
+    <div class="divider"></div>
+
+    <p class="tagline">Join us as we begin our forever</p>
+
+    <p class="cta-note">Check your email for your personal invitation link</p>
+  </section>
+
+  <footer>bhumikaanddarshil.com</footer>
+
+</body>
+</html>

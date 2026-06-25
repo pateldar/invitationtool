@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Bhumika &amp; Darshil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blush:  #f5ebe0;
+      --rose:   #c9a98e;
+      --deep:   #4a3728;
+      --text:   #3d2e22;
+      --light:  #faf6f1;
+      --muted:  #8a7060;
+      --border: #e8d8c8;
+      --green:  #4a7c59;
+      --amber:  #b07d2e;
+      --red:    #8b3a3a;
+      --sidebar-w: 240px;
+    }
+
+    html, body { height: 100%; font-family: 'Jost', sans-serif; font-weight: 300; color: var(--text); }
+
+    /* ---- LOGIN ---- */
+    #login-screen {
+      min-height: 100vh;
+      background: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .login-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: var(--deep);
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 32px;
+    }
+
+    .login-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.18s;
+      margin-bottom: 16px;
+    }
+
+    .login-field:focus { border-color: var(--rose); }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--deep);
+      color: var(--blush);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-btn:hover { background: var(--rose); }
+
+    .login-error {
+      background: #fdf0f0;
+      border: 1px solid #f0c0b0;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: var(--red);
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ---- APP LAYOUT ---- */
+    #app { display: none; height: 100vh; overflow: hidden; }
+
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--deep);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .sidebar-brand {
+      padding: 28px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-brand h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 300;
+      letter-spacing: 0.03em;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-brand p {
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    .nav-section {
+      padding: 16px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.4;
+      padding: 8px 20px 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      opacity: 0.7;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover { opacity: 1; background: rgba(255,255,255,0.05); }
+    .nav-item.active { opacity: 1; border-left-color: var(--rose); background: rgba(255,255,255,0.07); }
+    .nav-item .icon { font-size: 1rem; }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+      width: 100%;
+    }
+    .logout-btn:hover { opacity: 1; }
+
+    /* ---- Main content ---- */
+    .main {
+      margin-left: var(--sidebar-w);
+      height: 100vh;
+      overflow-y: auto;
+      background: #f7f2ec;
+    }
+
+    .top-bar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .top-bar h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--deep);
+    }
+
+    .refresh-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      padding: 7px 14px;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .refresh-btn:hover { border-color: var(--rose); color: var(--rose); }
+
+    .content { padding: 28px 32px; }
+
+    /* ---- Panels (tabs) ---- */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ---- Stats row ---- */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px 20px 16px;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--deep);
+      line-height: 1;
+    }
+
+    .stat-card.going .stat-value   { color: var(--green); }
+    .stat-card.maybe .stat-value   { color: var(--amber); }
+    .stat-card.no .stat-value      { color: var(--red); }
+
+    /* ---- Tables ---- */
+    .section-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-head h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--deep);
+    }
+
+    .action-btn {
+      padding: 7px 14px;
+      background: var(--deep);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .action-btn:hover { background: var(--rose); }
+    .action-btn.outline {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+    }
+    .action-btn.outline:hover { border-color: var(--rose); color: var(--rose); background: none; }
+    .action-btn.danger { background: none; border: 1.5px solid #e0b0a0; color: var(--red); }
+    .action-btn.danger:hover { background: #fdf0f0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #faf8f5;
+      font-weight: 400;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fdf9f5; }
+
+    .empty-row td {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px;
+      font-style: italic;
+    }
+
+    /* Status badge */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+    .badge.going    { background: #e8f4ec; color: var(--green); }
+    .badge.maybe    { background: #fdf3e3; color: var(--amber); }
+    .badge.not_going { background: #fdf0f0; color: var(--red); }
+    .badge.pending  { background: #f0f0f0; color: var(--muted); }
+
+    /* Copy link */
+    .link-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .link-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: monospace;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { border-color: var(--rose); color: var(--rose); }
+    .copy-btn.copied { background: #e8f4ec; border-color: var(--green); color: var(--green); }
+
+    /* ---- Modal ---- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      display: none;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 6px;
+      padding: 32px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--deep);
+      margin-bottom: 24px;
+    }
+
+    .form-field {
+      margin-bottom: 16px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.18s;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus { border-color: var(--rose); }
+
+    .form-field select[multiple] { height: 120px; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .modal-error {
+      background: #fdf0f0;
+      border: 1px solid #f0c0b0;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: var(--red);
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ---- Filter tabs ---- */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 6px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: white;
+      color: var(--muted);
+    }
+    .filter-tab.active { background: var(--deep); border-color: var(--deep); color: white; }
+    .filter-tab:hover:not(.active) { border-color: var(--rose); color: var(--rose); }
+
+    /* Loading shimmer */
+    .shimmer {
+      background: linear-gradient(90deg, #f0ebe4 25%, #e8e0d8 50%, #f0ebe4 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 4px;
+      height: 14px;
+      display: inline-block;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--deep);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      z-index: 999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .content { padding: 20px 16px; }
+      .top-bar { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1 class="login-title">Bhumika &amp; Darshil</h1>
+    <p class="login-subtitle">Host Dashboard</p>
+    <input class="login-field" type="password" id="pw-input" placeholder="Enter password" />
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <h1>Bhumika &amp; Darshil</h1>
+      <p>Host Dashboard</p>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" data-panel="rsvps" onclick="switchPanel('rsvps', this)">
+        <span class="icon">📊</span> RSVPs
+      </div>
+      <div class="nav-label" style="margin-top:12px">Manage</div>
+      <div class="nav-item" data-panel="guests" onclick="switchPanel('guests', this)">
+        <span class="icon">👥</span> Guests
+      </div>
+      <div class="nav-item" data-panel="events" onclick="switchPanel('events', this)">
+        <span class="icon">📅</span> Events
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="top-bar">
+      <h2 id="panel-title">RSVPs</h2>
+      <button class="refresh-btn" onclick="loadAll()">↺ Refresh</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ---- RSVP PANEL ---- -->
+      <div id="panel-rsvps" class="panel active">
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Invited</div><div class="stat-value" id="stat-total">–</div></div>
+          <div class="stat-card going"><div class="stat-label">Going</div><div class="stat-value" id="stat-going">–</div></div>
+          <div class="stat-card maybe"><div class="stat-label">Maybe</div><div class="stat-value" id="stat-maybe">–</div></div>
+          <div class="stat-card no"><div class="stat-label">Can't Attend</div><div class="stat-value" id="stat-no">–</div></div>
+          <div class="stat-card"><div class="stat-label">Awaiting Reply</div><div class="stat-value" id="stat-pending">–</div></div>
+        </div>
+
+        <!-- Filter by event -->
+        <div class="filter-tabs" id="event-filter-tabs">
+          <div class="filter-tab active" data-event="all" onclick="filterRSVPs('all', this)">All Events</div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-head">
+            <h3>RSVP Responses</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Event</th>
+                <th>Status</th>
+                <th>Attending</th>
+                <th>Message</th>
+                <th>Replied</th>
+              </tr>
+            </thead>
+            <tbody id="rsvp-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ---- GUESTS PANEL ---- -->
+      <div id="panel-guests" class="panel">
+        <div class="section-card">
+          <div class="section-head">
+            <h3>Guest List</h3>
+            <button class="action-btn" onclick="openAddGuest()">+ Add Guest</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Party Size</th>
+                <th>Events</th>
+                <th>Invite Link</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="guest-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ---- EVENTS PANEL ---- -->
+      <div id="panel-events" class="panel">
+        <div class="section-card">
+          <div class="section-head">
+            <h3>Events</h3>
+            <button class="action-btn" onclick="openAddEvent()">+ Add Event</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Venue</th>
+                <th>Address</th>
+              </tr>
+            </thead>
+            <tbody id="event-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="modal-guest">
+  <div class="modal">
+    <h2>Add Guest</h2>
+    <div class="form-field">
+      <label>Guest / Group Name *</label>
+      <input type="text" id="g-name" placeholder="e.g. The Patel Family" />
+    </div>
+    <div class="form-field">
+      <label>Email (optional)</label>
+      <input type="email" id="g-email" placeholder="guest@email.com" />
+    </div>
+    <div class="form-field">
+      <label>Party Size (max people on this invite)</label>
+      <input type="number" id="g-size" min="1" max="20" value="1" />
+    </div>
+    <div class="form-field">
+      <label>Invited to Events (hold Ctrl/Cmd to select multiple)</label>
+      <select id="g-events" multiple></select>
+    </div>
+    <div class="form-field">
+      <label>Internal Note (not shown to guest)</label>
+      <input type="text" id="g-note" placeholder="Optional note for yourself" />
+    </div>
+    <div class="modal-error" id="guest-modal-error"></div>
+    <div class="modal-actions">
+      <button class="action-btn outline" onclick="closeModal('modal-guest')">Cancel</button>
+      <button class="action-btn" onclick="saveGuest()">Save &amp; Generate Link</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-event">
+  <div class="modal">
+    <h2>Add Event</h2>
+    <div class="form-field">
+      <label>Event Name *</label>
+      <input type="text" id="ev-name" placeholder="e.g. Engagement Celebration" />
+    </div>
+    <div class="form-field">
+      <label>Date</label>
+      <input type="text" id="ev-date" placeholder="e.g. Saturday, August 9, 2025" />
+    </div>
+    <div class="form-field">
+      <label>Time</label>
+      <input type="text" id="ev-time" placeholder="e.g. 6:00 PM" />
+    </div>
+    <div class="form-field">
+      <label>Venue Name</label>
+      <input type="text" id="ev-venue" placeholder="e.g. The Grand Ballroom" />
+    </div>
+    <div class="form-field">
+      <label>Address</label>
+      <input type="text" id="ev-address" placeholder="123 Main St, City, State" />
+    </div>
+    <div class="form-field">
+      <label>Description / Dress Code (optional)</label>
+      <textarea id="ev-desc" rows="3" placeholder="Any extra details for guests…"></textarea>
+    </div>
+    <div class="modal-error" id="event-modal-error"></div>
+    <div class="modal-actions">
+      <button class="action-btn outline" onclick="closeModal('modal-event')">Cancel</button>
+      <button class="action-btn" onclick="saveEvent()">Save Event</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbxOAsj2SgiXA9oIv-wbwgHiu4kMdvfYl73Q-iTbiwsqP9V7Iu2SHe8fSPG3a9fdC1qv/exec";
+const SITE_BASE    = "https://bhumikaanddarshil.com/rsvp";
+const ADMIN_PW_KEY = "bd_admin_token";
+const ADMIN_PW     = "BhumikaAndDarshil1998!"; // Must match apps-script.gs
+
+// ============================================================
+// Auth
+// ============================================================
+let token = sessionStorage.getItem(ADMIN_PW_KEY) || '';
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (token) showApp();
+
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+function doLogin() {
+  const pw = document.getElementById('pw-input').value.trim();
+  if (pw === ADMIN_PW) {
+    token = pw;
+    sessionStorage.setItem(ADMIN_PW_KEY, pw);
+    document.getElementById('login-error').style.display = 'none';
+    showApp();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem(ADMIN_PW_KEY);
+  token = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadAll();
+}
+
+// ============================================================
+// State
+// ============================================================
+let allGuests = [];
+let allRSVPs  = [];
+let allEvents = [];
+let rsvpFilter = 'all';
+
+// ============================================================
+// Load data
+// ============================================================
+async function loadAll() {
+  try {
+    const [gRes, rRes, eRes] = await Promise.all([
+      apiFetch(`?action=getGuests&token=${encodeURIComponent(token)}`),
+      apiFetch(`?action=getRSVPs&token=${encodeURIComponent(token)}`),
+      apiFetch(`?action=getEvents&token=${encodeURIComponent(token)}`),
+    ]);
+
+    if (gRes.success)  allGuests = gRes.guests  || [];
+    if (rRes.success)  allRSVPs  = rRes.rsvps   || [];
+    if (eRes.success)  allEvents = eRes.events   || [];
+
+    renderAll();
+  } catch (err) {
+    showToast('Error loading data. Check your Script URL.', true);
+    console.error(err);
+  }
+}
+
+function renderAll() {
+  renderStats();
+  renderRSVPTable();
+  renderGuestTable();
+  renderEventTable();
+  renderEventFilter();
+}
+
+// ============================================================
+// Stats
+// ============================================================
+function renderStats() {
+  // Unique guests who have responded
+  const respondedCodes = new Set(allRSVPs.map(r => r.guestCode));
+  const goingCodes     = new Set(allRSVPs.filter(r => r.status === 'going').map(r => r.guestCode));
+  const maybeCodes     = new Set(allRSVPs.filter(r => r.status === 'maybe').map(r => r.guestCode));
+  const noCodes        = new Set(allRSVPs.filter(r => r.status === 'not_going').map(r => r.guestCode));
+  const pendingCount   = allGuests.filter(g => !respondedCodes.has(g.code)).length;
+
+  document.getElementById('stat-total').textContent   = allGuests.length;
+  document.getElementById('stat-going').textContent   = goingCodes.size;
+  document.getElementById('stat-maybe').textContent   = maybeCodes.size;
+  document.getElementById('stat-no').textContent      = noCodes.size;
+  document.getElementById('stat-pending').textContent = pendingCount;
+}
+
+// ============================================================
+// RSVP Table
+// ============================================================
+function renderEventFilter() {
+  const tabs = document.getElementById('event-filter-tabs');
+  // Clear existing event tabs (keep "All")
+  while (tabs.children.length > 1) tabs.removeChild(tabs.lastChild);
+
+  allEvents.forEach(ev => {
+    const tab = document.createElement('div');
+    tab.className = 'filter-tab';
+    tab.dataset.event = ev.id;
+    tab.textContent = ev.name;
+    tab.onclick = () => filterRSVPs(ev.id, tab);
+    tabs.appendChild(tab);
+  });
+}
+
+function filterRSVPs(eventId, el) {
+  rsvpFilter = eventId;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderRSVPTable();
+}
+
+function renderRSVPTable() {
+  const tbody = document.getElementById('rsvp-table-body');
+  tbody.innerHTML = '';
+
+  // Build lookup: guestCode → guest name
+  const guestMap = {};
+  allGuests.forEach(g => guestMap[g.code] = g.name);
+
+  // Filter RSVPs by event if needed
+  const rsvps = rsvpFilter === 'all'
+    ? allRSVPs
+    : allRSVPs.filter(r => r.eventId === rsvpFilter);
+
+  // Also show guests who haven't responded
+  const respondedSet = new Set(rsvps.map(r => r.guestCode + '|' + r.eventId));
+
+  // Get guests invited to this event
+  let rows = [...rsvps];
+
+  if (rsvpFilter !== 'all') {
+    allGuests.forEach(g => {
+      const eventIds = (g.eventIds || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (eventIds.includes(rsvpFilter) && !respondedSet.has(g.code + '|' + rsvpFilter)) {
+        const ev = allEvents.find(e => e.id === rsvpFilter);
+        rows.push({ guestCode: g.code, guestName: g.name, eventId: rsvpFilter, eventName: ev?.name || '', status: 'pending', attendingCount: '', message: '', timestamp: '' });
+      }
+    });
+  }
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No RSVPs yet</td></tr>';
+    return;
+  }
+
+  rows.forEach(r => {
+    const name = r.guestName || guestMap[r.guestCode] || r.guestCode;
+    const ts   = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '–';
+    const statusLabel = r.status === 'going' ? 'Going' : r.status === 'maybe' ? 'Maybe' : r.status === 'not_going' ? "Can't Go" : 'Pending';
+    const count = r.status === 'going' && r.attendingCount ? r.attendingCount : (r.status === 'pending' ? '–' : '–');
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><strong>${escHtml(name)}</strong></td>
+        <td>${escHtml(r.eventName || '')}</td>
+        <td><span class="badge ${r.status || 'pending'}">${statusLabel}</span></td>
+        <td>${count}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:0.78rem">${escHtml(r.message || '')}</td>
+        <td style="color:var(--muted);font-size:0.78rem">${ts}</td>
+      </tr>
+    `);
+  });
+}
+
+// ============================================================
+// Guest Table
+// ============================================================
+function renderGuestTable() {
+  const tbody = document.getElementById('guest-table-body');
+  tbody.innerHTML = '';
+
+  if (allGuests.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No guests yet — add your first guest!</td></tr>';
+    return;
+  }
+
+  // Build event name lookup
+  const eventMap = {};
+  allEvents.forEach(e => eventMap[e.id] = e.name);
+
+  allGuests.forEach(g => {
+    const link = `${SITE_BASE}/?code=${encodeURIComponent(g.code)}`;
+    const eventNames = (g.eventIds || '').split(',').filter(Boolean)
+      .map(id => eventMap[id.trim()] || id.trim()).join(', ');
+
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><strong>${escHtml(g.name)}</strong>${g.note ? `<br><span style="font-size:0.75rem;color:var(--muted)">${escHtml(g.note)}</span>` : ''}</td>
+        <td>${g.partySize || 1}</td>
+        <td style="font-size:0.78rem;color:var(--muted)">${escHtml(eventNames) || '–'}</td>
+        <td>
+          <div class="link-cell">
+            <span class="link-text" title="${link}">${link}</span>
+            <button class="copy-btn" onclick="copyLink(this,'${link}')">Copy</button>
+          </div>
+        </td>
+        <td>
+          <button class="action-btn danger" onclick="deleteGuest('${escAttr(g.code)}')">Delete</button>
+        </td>
+      </tr>
+    `);
+  });
+}
+
+// ============================================================
+// Event Table
+// ============================================================
+function renderEventTable() {
+  const tbody = document.getElementById('event-table-body');
+  tbody.innerHTML = '';
+
+  if (allEvents.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No events yet — add your first event!</td></tr>';
+    return;
+  }
+
+  allEvents.forEach(ev => {
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><strong>${escHtml(ev.name)}</strong>${ev.description ? `<br><span style="font-size:0.75rem;color:var(--muted)">${escHtml(ev.description)}</span>` : ''}</td>
+        <td>${escHtml(ev.date || '–')}</td>
+        <td>${escHtml(ev.time || '–')}</td>
+        <td>${escHtml(ev.venue || '–')}</td>
+        <td style="font-size:0.78rem;color:var(--muted)">${escHtml(ev.address || '–')}</td>
+      </tr>
+    `);
+  });
+}
+
+// ============================================================
+// Panel switching
+// ============================================================
+const panelTitles = { rsvps: 'RSVPs', guests: 'Guest List', events: 'Events' };
+
+function switchPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('panel-title').textContent = panelTitles[name] || name;
+}
+
+// ============================================================
+// Add Guest Modal
+// ============================================================
+function openAddGuest() {
+  // Populate event multi-select
+  const sel = document.getElementById('g-events');
+  sel.innerHTML = '';
+  allEvents.forEach(ev => {
+    const opt = document.createElement('option');
+    opt.value = ev.id;
+    opt.textContent = ev.name;
+    sel.appendChild(opt);
+  });
+
+  ['g-name','g-email','g-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('g-size').value = 1;
+  document.getElementById('guest-modal-error').style.display = 'none';
+  document.getElementById('modal-guest').classList.add('open');
+}
+
+async function saveGuest() {
+  const name     = document.getElementById('g-name').value.trim();
+  const email    = document.getElementById('g-email').value.trim();
+  const size     = document.getElementById('g-size').value;
+  const note     = document.getElementById('g-note').value.trim();
+  const eventSel = document.getElementById('g-events');
+  const eventIds = Array.from(eventSel.selectedOptions).map(o => o.value).join(',');
+  const errEl    = document.getElementById('guest-modal-error');
+
+  if (!name) { errEl.textContent = 'Guest name is required.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  try {
+    const res = await apiFetch('', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'addGuest', token, name, email, partySize: size, eventIds, note })
+    });
+    if (res.success) {
+      closeModal('modal-guest');
+      showToast('Guest added!');
+      await loadAll();
+      // Switch to guests panel
+      switchPanel('guests', document.querySelector('[data-panel="guests"]'));
+    } else {
+      errEl.textContent = res.error || 'Failed to save.';
+      errEl.style.display = 'block';
+    }
+  } catch (err) {
+    errEl.textContent = 'Error connecting to backend.';
+    errEl.style.display = 'block';
+  }
+}
+
+async function deleteGuest(code) {
+  if (!confirm('Delete this guest and their invite link?')) return;
+  const res = await apiFetch(`?action=deleteGuest&code=${encodeURIComponent(code)}&token=${encodeURIComponent(token)}`);
+  if (res.success) { showToast('Guest deleted.'); await loadAll(); }
+  else showToast('Error deleting guest.', true);
+}
+
+// ============================================================
+// Add Event Modal
+// ============================================================
+function openAddEvent() {
+  ['ev-name','ev-date','ev-time','ev-venue','ev-address','ev-desc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('event-modal-error').style.display = 'none';
+  document.getElementById('modal-event').classList.add('open');
+}
+
+async function saveEvent() {
+  const name    = document.getElementById('ev-name').value.trim();
+  const errEl   = document.getElementById('event-modal-error');
+  if (!name) { errEl.textContent = 'Event name is required.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const params = {
+    name,
+    date:        document.getElementById('ev-date').value.trim(),
+    time:        document.getElementById('ev-time').value.trim(),
+    venue:       document.getElementById('ev-venue').value.trim(),
+    address:     document.getElementById('ev-address').value.trim(),
+    description: document.getElementById('ev-desc').value.trim(),
+    token,
+  };
+
+  try {
+    const res = await apiFetch(`?action=addEvent&${new URLSearchParams(params)}`);
+    if (res.success) {
+      closeModal('modal-event');
+      showToast('Event added!');
+      await loadAll();
+      switchPanel('events', document.querySelector('[data-panel="events"]'));
+    } else {
+      errEl.textContent = res.error || 'Failed to save.';
+      errEl.style.display = 'block';
+    }
+  } catch (err) {
+    errEl.textContent = 'Error connecting to backend.';
+    errEl.style.display = 'block';
+  }
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function copyLink(btn, link) {
+  navigator.clipboard.writeText(link).then(() => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError ? '#8b3a3a' : 'var(--deep)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str || ''));
+  return d.innerHTML;
+}
+
+function escAttr(str) { return (str || '').replace(/'/g, "\\'"); }
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(SCRIPT_URL + path, {
+    ...opts,
+    redirect: 'follow',
+    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
+  });
+  return res.json();
+}
+</script>
+</body>
+</html>

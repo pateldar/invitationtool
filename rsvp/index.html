@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're Invited — Bhumika &amp; Darshil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:  #f5ebe0;
+      --rose:   #c9a98e;
+      --gold:   #b8860b;
+      --deep:   #4a3728;
+      --text:   #3d2e22;
+      --light:  #faf6f1;
+      --muted:  #8a7060;
+      --border: #e8d8c8;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--light);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 10px;
+      border: 1px solid rgba(201,169,142,0.4);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* ---- Loading / Error states ---- */
+    #loading-state, #error-state {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    #invite-wrap { display: none; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid var(--border);
+      border-top-color: var(--rose);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    /* ---- Page layout ---- */
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 64px 28px 80px;
+    }
+
+    /* ---- Header ---- */
+    .invite-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 20px;
+    }
+
+    .couple-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      font-weight: 300;
+      color: var(--deep);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .couple-title em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .greeting {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 32px 0;
+      color: var(--rose);
+      opacity: 0.5;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rose);
+    }
+
+    /* ---- Event card ---- */
+    .events-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--deep);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .event-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px 28px;
+      position: relative;
+    }
+
+    .event-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--rose);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .event-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--deep);
+      margin-bottom: 8px;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .event-meta span::before {
+      margin-right: 5px;
+    }
+
+    .event-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    /* ---- RSVP form ---- */
+    .rsvp-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--deep);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .rsvp-subtitle {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Per-event RSVP block */
+    .rsvp-event-block {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .rsvp-event-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--deep);
+      margin-bottom: 16px;
+    }
+
+    /* Radio buttons styled as choice cards */
+    .rsvp-choices {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .rsvp-choice {
+      position: relative;
+    }
+
+    .rsvp-choice input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+
+    .rsvp-choice label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      user-select: none;
+      background: white;
+    }
+
+    .rsvp-choice label .choice-icon {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+
+    .rsvp-choice input:checked + label {
+      border-color: var(--rose);
+      background: var(--blush);
+      color: var(--deep);
+    }
+
+    .rsvp-choice label:hover {
+      border-color: var(--rose);
+      background: rgba(201,169,142,0.08);
+    }
+
+    /* Going count */
+    .attending-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .attending-row label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .qty-btn {
+      background: none;
+      border: none;
+      width: 34px; height: 34px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--rose);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .qty-btn:hover { background: var(--blush); }
+
+    .qty-val {
+      width: 36px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--deep);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      height: 34px;
+      line-height: 34px;
+      user-select: none;
+    }
+
+    /* ---- Guest name field ---- */
+    .field-group {
+      margin-bottom: 20px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field-group input,
+    .field-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text);
+      background: white;
+      outline: none;
+      transition: border-color 0.18s;
+    }
+
+    .field-group input:focus,
+    .field-group textarea:focus {
+      border-color: var(--rose);
+    }
+
+    .field-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* ---- Submit ---- */
+    .submit-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--deep);
+      color: var(--blush);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 28px;
+    }
+
+    .submit-btn:hover { background: var(--rose); }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ---- Success state ---- */
+    #success-state {
+      display: none;
+      text-align: center;
+      padding: 64px 28px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .success-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      color: var(--deep);
+      margin-bottom: 12px;
+    }
+
+    .success-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ---- Error notice ---- */
+    .form-error {
+      background: #fdf0f0;
+      border: 1px solid #f0c0b0;
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: #a04030;
+      margin-top: 16px;
+      display: none;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--rose);
+      opacity: 0.5;
+    }
+
+    @media (max-width: 480px) {
+      .rsvp-choices { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .rsvp-choice label { padding: 10px 4px; font-size: 0.7rem; }
+      .event-card, .rsvp-event-block { padding: 18px 16px; }
+      .page { padding: 44px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading-state">
+    <div class="spinner"></div>
+    <p style="font-size:0.82rem;letter-spacing:0.1em;color:var(--muted)">Loading your invitation…</p>
+  </div>
+
+  <!-- Error -->
+  <div id="error-state" style="display:none">
+    <div class="error-icon">✉️</div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--deep);margin-bottom:10px">Invitation Not Found</p>
+    <p style="font-size:0.85rem;color:var(--muted);max-width:340px;line-height:1.6" id="error-msg">
+      We couldn't find your invitation. Please check the link you received or contact us directly.
+    </p>
+  </div>
+
+  <!-- Main invite -->
+  <div id="invite-wrap">
+    <div class="page">
+      <!-- Header -->
+      <header class="invite-header">
+        <p class="eyebrow">You are cordially invited</p>
+        <h1 class="couple-title">Bhumika <em>&amp;</em> Darshil</h1>
+        <p class="greeting" id="guest-greeting">Dear Guest,<br>We joyfully request your presence at our upcoming celebration.</p>
+      </header>
+
+      <!-- Events -->
+      <section class="events-section" id="events-section">
+        <div class="divider">✦</div>
+        <h2>The Celebration</h2>
+        <div class="event-list" id="event-list"></div>
+      </section>
+
+      <!-- RSVP form -->
+      <section class="rsvp-section" id="rsvp-section">
+        <div class="divider">✦</div>
+        <h2>Kindly Reply</h2>
+        <p class="rsvp-subtitle" id="rsvp-subtitle">Please RSVP for each event below</p>
+
+        <form id="rsvp-form" novalidate>
+          <div class="field-group">
+            <label for="guest-name">Your Name</label>
+            <input type="text" id="guest-name" placeholder="Full name" autocomplete="name" />
+          </div>
+
+          <!-- Per-event RSVP blocks injected here -->
+          <div id="rsvp-events-container"></div>
+
+          <div class="field-group" style="margin-top:20px">
+            <label for="guest-message">A note for the couple <span style="opacity:0.6">(optional)</span></label>
+            <textarea id="guest-message" placeholder="Share your well wishes…"></textarea>
+          </div>
+
+          <div class="form-error" id="form-error"></div>
+          <button type="submit" class="submit-btn" id="submit-btn">Send my RSVP</button>
+        </form>
+      </section>
+    </div>
+
+    <footer>bhumikaanddarshil.com</footer>
+  </div>
+
+  <!-- Success -->
+  <div id="success-state">
+    <div class="success-icon">🌸</div>
+    <h2 class="success-title">Thank you!</h2>
+    <p class="success-body" id="success-msg">Your RSVP has been received. We can't wait to celebrate with you.</p>
+  </div>
+
+<script>
+// ============================================================
+// CONFIG — paste your Apps Script Web App URL here
+// ============================================================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOAsj2SgiXA9oIv-wbwgHiu4kMdvfYl73Q-iTbiwsqP9V7Iu2SHe8fSPG3a9fdC1qv/exec";
+
+// ============================================================
+// State
+// ============================================================
+let guestData  = null;
+let events     = [];
+let existingRSVPs = {};
+let guestCode  = "";
+
+// Per-event RSVP state: { [eventId]: { status, count } }
+const rsvpState = {};
+
+// ============================================================
+// Init
+// ============================================================
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  guestCode = params.get('code') || params.get('c') || '';
+
+  if (!guestCode) {
+    showError("No invitation code found in this link.");
+    return;
+  }
+
+  try {
+    const res = await apiFetch(`?action=getGuest&code=${encodeURIComponent(guestCode)}`);
+    if (!res.success) { showError(res.error); return; }
+
+    guestData = res.guest;
+    events    = res.events || [];
+
+    // Build existing RSVP lookup
+    (res.rsvps || []).forEach(r => { existingRSVPs[r.eventId] = r; });
+
+    renderInvite();
+  } catch (err) {
+    showError("Unable to load your invitation. Please try again.");
+    console.error(err);
+  }
+});
+
+// ============================================================
+// Render
+// ============================================================
+function renderInvite() {
+  // Greeting
+  const name = guestData.name || "Guest";
+  document.getElementById('guest-greeting').innerHTML =
+    `Dear <strong style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1em;font-weight:400">${escHtml(name)}</strong>,<br>We joyfully request your presence at our upcoming celebration.`;
+
+  // Prefill name
+  document.getElementById('guest-name').value = name;
+
+  // Events list
+  const eventList = document.getElementById('event-list');
+  const rsvpContainer = document.getElementById('rsvp-events-container');
+
+  if (events.length === 0) {
+    eventList.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:0.85rem">Event details coming soon — stay tuned!</p>';
+    document.getElementById('rsvp-section').style.display = 'none';
+  } else {
+    events.forEach(ev => {
+      // Event display card
+      const card = document.createElement('div');
+      card.className = 'event-card';
+      card.innerHTML = `
+        <div class="event-name">${escHtml(ev.name)}</div>
+        <div class="event-meta">
+          ${ev.date ? `<span>📅 ${escHtml(ev.date)}</span>` : ''}
+          ${ev.time ? `<span>🕐 ${escHtml(ev.time)}</span>` : ''}
+          ${ev.venue ? `<span>📍 ${escHtml(ev.venue)}</span>` : ''}
+        </div>
+        ${ev.address ? `<div class="event-desc">${escHtml(ev.address)}</div>` : ''}
+        ${ev.description ? `<div class="event-desc" style="margin-top:8px">${escHtml(ev.description)}</div>` : ''}
+      `;
+      eventList.appendChild(card);
+
+      // RSVP block
+      const maxGuests = parseInt(guestData.partySize) || 1;
+      const existing  = existingRSVPs[ev.id];
+      const initStatus = existing ? existing.status : null;
+      const initCount  = existing ? (parseInt(existing.attendingCount) || 1) : 1;
+
+      rsvpState[ev.id] = { status: initStatus, count: initCount };
+
+      const block = document.createElement('div');
+      block.className = 'rsvp-event-block';
+      block.innerHTML = `
+        <div class="rsvp-event-name">${escHtml(ev.name)}</div>
+        <div class="rsvp-choices">
+          ${rsvpChoice(ev.id, 'going',     '🎉', 'Going',    initStatus === 'going')}
+          ${rsvpChoice(ev.id, 'maybe',     '🤔', 'Maybe',    initStatus === 'maybe')}
+          ${rsvpChoice(ev.id, 'not_going', '😔', "Can't Go", initStatus === 'not_going')}
+        </div>
+        ${maxGuests > 1 ? `
+        <div class="attending-row" id="count-row-${ev.id}" style="display:${initStatus === 'going' ? 'flex' : 'none'}">
+          <label>How many attending?</label>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" onclick="changeCount('${ev.id}',-1)">−</button>
+            <div class="qty-val" id="count-val-${ev.id}">${initCount}</div>
+            <button type="button" class="qty-btn" onclick="changeCount('${ev.id}',1)">+</button>
+          </div>
+          <span style="font-size:0.75rem;color:var(--muted)">(max ${maxGuests})</span>
+        </div>` : ''}
+      `;
+      rsvpContainer.appendChild(block);
+
+      // Wire up radio change
+      block.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', () => onRSVPChange(ev.id, maxGuests));
+      });
+    });
+  }
+
+  // Update subtitle
+  if (events.length === 1) {
+    document.getElementById('rsvp-subtitle').textContent = "Will you be joining us?";
+  }
+
+  // Show invite
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('invite-wrap').style.display   = 'block';
+}
+
+function rsvpChoice(eventId, value, icon, label, checked) {
+  const id = `rsvp-${eventId}-${value}`;
+  return `
+    <div class="rsvp-choice">
+      <input type="radio" name="rsvp-${eventId}" id="${id}" value="${value}" ${checked ? 'checked' : ''}>
+      <label for="${id}">
+        <span class="choice-icon">${icon}</span>
+        ${label}
+      </label>
+    </div>`;
+}
+
+// ============================================================
+// Interactions
+// ============================================================
+function onRSVPChange(eventId, maxGuests) {
+  const selected = document.querySelector(`input[name="rsvp-${eventId}"]:checked`);
+  if (!selected) return;
+  rsvpState[eventId].status = selected.value;
+
+  const countRow = document.getElementById(`count-row-${eventId}`);
+  if (countRow) {
+    countRow.style.display = selected.value === 'going' ? 'flex' : 'none';
+  }
+}
+
+function changeCount(eventId, delta) {
+  const maxGuests = parseInt(guestData.partySize) || 1;
+  const current   = rsvpState[eventId].count;
+  const next      = Math.max(1, Math.min(maxGuests, current + delta));
+  rsvpState[eventId].count = next;
+  const el = document.getElementById(`count-val-${eventId}`);
+  if (el) el.textContent = next;
+}
+
+// ============================================================
+// Submit
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('rsvp-form');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await submitRSVP();
+  });
+});
+
+async function submitRSVP() {
+  const errEl  = document.getElementById('form-error');
+  const btn    = document.getElementById('submit-btn');
+  const nameEl = document.getElementById('guest-name');
+
+  errEl.style.display = 'none';
+
+  // Validate all events have an RSVP
+  const missingEvents = events.filter(ev => !rsvpState[ev.id]?.status);
+  if (missingEvents.length > 0) {
+    const names = missingEvents.map(e => e.name).join(', ');
+    errEl.textContent = `Please select your RSVP for: ${names}`;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  const rsvps = events.map(ev => ({
+    eventId:        ev.id,
+    eventName:      ev.name,
+    status:         rsvpState[ev.id].status,
+    attendingCount: rsvpState[ev.id].status === 'going' ? (rsvpState[ev.id].count || 1) : 0,
+  }));
+
+  try {
+    const res = await apiFetch('', {
+      method: 'POST',
+      body: JSON.stringify({
+        action:     'submitRSVP',
+        guestCode,
+        guestName:  nameEl.value.trim() || guestData.name || '',
+        message:    document.getElementById('guest-message').value.trim(),
+        rsvps
+      })
+    });
+
+    if (res.success) {
+      document.getElementById('invite-wrap').style.display = 'none';
+      const successEl = document.getElementById('success-state');
+      successEl.style.display = 'block';
+
+      // Personalized message based on responses
+      const goingCount = rsvps.filter(r => r.status === 'going').length;
+      let msg = '';
+      if (goingCount === events.length) {
+        msg = "We're so excited to celebrate with you! More details to follow.";
+      } else if (goingCount > 0) {
+        msg = "We look forward to seeing you at the events you can attend!";
+      } else {
+        msg = "We're sorry you can't make it, but you'll be in our thoughts on these special days.";
+      }
+      document.getElementById('success-msg').textContent = msg;
+    } else {
+      throw new Error(res.error || 'Submission failed');
+    }
+  } catch (err) {
+    errEl.textContent = 'Something went wrong. Please try again or contact us directly.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Send my RSVP';
+  }
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+function showError(msg) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('error-state').style.display   = 'flex';
+  if (msg) document.getElementById('error-msg').textContent = msg;
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str || ''));
+  return d.innerHTML;
+}
+
+async function apiFetch(path, opts = {}) {
+  const url = SCRIPT_URL + path;
+  const res = await fetch(url, {
+    ...opts,
+    redirect: 'follow',
+    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
+  });
+  return res.json();
+}
+</script>
+</body>
+</html>
