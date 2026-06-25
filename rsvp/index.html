@@ -593,7 +593,7 @@ function renderInvite() {
       card.innerHTML = `
         <div class="event-name">${escHtml(ev.name)}</div>
         <div class="event-meta">
-          ${ev.date ? `<span>📅 ${escHtml(ev.date)}</span>` : ''}
+          ${ev.date ? `<span>📅 ${escHtml(formatDate(ev.date))}</span>` : ''}
           ${ev.time ? `<span>🕐 ${escHtml(ev.time)}</span>` : ''}
           ${ev.venue ? `<span>📍 ${escHtml(ev.venue)}</span>` : ''}
         </div>
@@ -770,6 +770,16 @@ function showError(msg) {
   document.getElementById('loading-state').style.display = 'none';
   document.getElementById('error-state').style.display   = 'flex';
   if (msg) document.getElementById('error-msg').textContent = msg;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  // Extract just YYYY-MM-DD to avoid timezone shifts
+  const datePart = String(dateStr).slice(0, 10);
+  const [year, month, day] = datePart.split('-').map(Number);
+  if (!year || !month || !day) return dateStr; // fallback for freeform text
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function escHtml(str) {
