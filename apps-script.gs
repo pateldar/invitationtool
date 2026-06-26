@@ -7,8 +7,8 @@
 // Then paste the Web App URL into your HTML files.
 // ============================================================
 
-const SHEET_ID = "YOUR_GOOGLE_SHEET_ID_HERE"; // Replace after creating your sheet
-const ADMIN_TOKEN = "YOUR_SECURE_ADMIN_PASSWORD"; // Change this to a strong password
+const SHEET_ID = "1y5QdtSQMVtBVMqjwNbnyDSI7tDBvunRIQxbeCLsuoqo";
+const ADMIN_TOKEN = "BhumikaAndDarshil1998!";
 
 // ---- Sheet name constants ----
 const SHEET_GUESTS = "Guests";
@@ -65,6 +65,9 @@ function doPost(e) {
     } else if (action === "addGuest") {
       if (data.token !== ADMIN_TOKEN) return jsonResponse({ success: false, error: "Unauthorized" });
       return jsonResponse(addGuest(data));
+    } else if (action === "addEvent") {
+      if (data.token !== ADMIN_TOKEN) return jsonResponse({ success: false, error: "Unauthorized" });
+      return jsonResponse(addEvent(data));
     } else {
       return jsonResponse({ success: false, error: "Unknown action" });
     }
@@ -119,7 +122,7 @@ function addGuest(params) {
   const sheet = ss.getSheetByName(SHEET_GUESTS);
 
   const code = params.code || generateCode();
-  const now = new Date().toISOString();
+  const now = new Date().toISOString().slice(0, 10);
   sheet.appendRow([
     code,
     params.name || "",
@@ -174,10 +177,30 @@ function getEventsByIds(ids) {
 
 function addEvent(params) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
-  ensureSheet(ss, SHEET_EVENTS, ["id", "name", "date", "time", "venue", "address", "description", "createdAt"]);
+  ensureSheet(ss, SHEET_EVENTS, ["id", "name", "date", "time", "venue", "address", "description", "imageUrl", "createdAt"]);
   const sheet = ss.getSheetByName(SHEET_EVENTS);
+
+  // Auto-add imageUrl column to sheets created before this update
+  const headerRow = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  if (!headerRow.includes("imageUrl")) {
+    const createdAtPos = headerRow.indexOf("createdAt");
+    if (createdAtPos >= 0) {
+      sheet.insertColumnBefore(createdAtPos + 1);
+      const cell = sheet.getRange(1, createdAtPos + 1);
+      cell.setValue("imageUrl");
+      cell.setFontWeight("bold").setBackground("#f3e8d6");
+    }
+  }
+
   const id = params.id || generateCode(8);
-  const now = new Date().toISOString();
+  const now = new Date().toISOString().slice(0, 10);
+
+  // Handle image: upload base64 to Drive, or use provided URL
+  let imageUrl = params.imageUrl || "";
+  if (params.imageBase64) {
+    imageUrl = uploadImageToDrive(params.imageBase64, params.imageMimeType || "image/jpeg", "event-" + id + ".jpg");
+  }
+
   sheet.appendRow([
     id,
     params.name || "",
@@ -186,9 +209,27 @@ function addEvent(params) {
     params.venue || "",
     params.address || "",
     params.description || "",
+    imageUrl,
     now
   ]);
   return { success: true, id };
+}
+
+// ============================================================
+// Image — upload base64 data to Google Drive, return public URL
+// ============================================================
+function uploadImageToDrive(base64Data, mimeType, filename) {
+  try {
+    const decoded = Utilities.base64Decode(base64Data);
+    const blob = Utilities.newBlob(decoded, mimeType || "image/jpeg", filename || "event-image.jpg");
+    const folder = DriveApp.getRootFolder();
+    const file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return "https://drive.google.com/uc?export=view&id=" + file.getId();
+  } catch (err) {
+    Logger.log("Image upload failed: " + err.message);
+    return "";
+  }
 }
 
 // ============================================================
@@ -199,7 +240,7 @@ function submitRSVP(data) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   ensureSheet(ss, SHEET_RSVPS, ["guestCode", "guestName", "eventId", "eventName", "status", "attendingCount", "message", "timestamp"]);
   const sheet = ss.getSheetByName(SHEET_RSVPS);
-  const now = new Date().toISOString();
+  const now = new Date().toISOString().slice(0, 10);
 
   // Remove existing RSVPs for this guest+event combo, then add fresh ones
   const existing = sheet.getDataRange().getValues();

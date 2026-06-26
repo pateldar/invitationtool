@@ -726,6 +726,75 @@
     #toast.success { background: var(--deep); color: var(--blush); }
     #toast.error { background: var(--red); color: white; }
 
+    /* ---- Image upload zone ---- */
+    .image-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+      position: relative;
+      background: #fdfaf6;
+    }
+    .image-drop-zone:hover,
+    .image-drop-zone.drag-over {
+      border-color: var(--rose);
+      background: var(--blush);
+    }
+    .image-drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .image-drop-hint { pointer-events: none; }
+    .image-drop-hint svg { color: var(--rose); opacity: 0.55; margin-bottom: 8px; }
+    .image-drop-hint p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 300;
+    }
+    .image-drop-hint span {
+      font-size: 0.7rem;
+      color: var(--muted);
+      opacity: 0.65;
+    }
+    .image-preview-wrap {
+      display: none;
+      position: relative;
+    }
+    .image-preview-wrap img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 7px;
+      display: block;
+      background: var(--blush);
+    }
+    .image-preview-remove {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      line-height: 1;
+    }
+    .image-preview-remove:hover { background: rgba(0,0,0,0.8); }
+
     /* ---- Shimmer skeleton ---- */
     .shimmer-row td {
       padding: 16px 18px;
@@ -740,7 +809,24 @@
     }
     @keyframes shimmer { to { background-position: -300% 0; } }
 
-    /* ---- Responsive ---- */
+    /* ---- Table scroll wrapper ---- */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ---- Responsive column hiding ---- */
+    /* col-hide-md: hidden on tablets/phones (≤640px) */
+    /* col-hide-sm: hidden only on small phones (≤440px) */
+    @media (max-width: 640px) {
+      .col-hide-md { display: none !important; }
+      .link-text { display: none; }           /* show Copy button only */
+    }
+    @media (max-width: 440px) {
+      .col-hide-sm { display: none !important; }
+    }
+
+    /* ---- Responsive layout ---- */
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(calc(-1 * var(--sidebar-w)));
@@ -870,19 +956,21 @@
           <div class="section-head">
             <h3>RSVP Responses</h3>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Guest</th>
-                <th>Event</th>
-                <th>Status</th>
-                <th>Attending</th>
-                <th>Note</th>
-                <th>Replied</th>
-              </tr>
-            </thead>
-            <tbody id="rsvp-table-body"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Guest</th>
+                  <th>Event</th>
+                  <th>Status</th>
+                  <th class="col-hide-sm">Attending</th>
+                  <th class="col-hide-md">Note</th>
+                  <th class="col-hide-md">Replied</th>
+                </tr>
+              </thead>
+              <tbody id="rsvp-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -896,18 +984,20 @@
               Add Guest
             </button>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Party Size</th>
-                <th>Events</th>
-                <th>Invite Link</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="guest-table-body"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th class="col-hide-sm">Party Size</th>
+                  <th class="col-hide-md">Events</th>
+                  <th>Invite Link</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="guest-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -921,18 +1011,20 @@
               Add Event
             </button>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Venue</th>
-                <th>Address</th>
-              </tr>
-            </thead>
-            <tbody id="event-table-body"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Date</th>
+                  <th class="col-hide-sm">Time</th>
+                  <th class="col-hide-md">Venue</th>
+                  <th class="col-hide-md">Address</th>
+                </tr>
+              </thead>
+              <tbody id="event-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -1011,6 +1103,27 @@
     <div class="form-field">
       <label>Description / Dress Code (optional)</label>
       <textarea id="ev-desc" rows="3" placeholder="Any extra details for guests…"></textarea>
+    </div>
+    <div class="form-field">
+      <label>Invitation Image (optional)</label>
+      <div class="image-drop-zone" id="ev-image-drop"
+           ondragover="handleDragOver(event)"
+           ondragleave="handleDragLeave(event)"
+           ondrop="handleDrop(event)">
+        <input type="file" id="ev-image-file" accept="image/*" onchange="handleImageSelect(event)" />
+        <div class="image-drop-hint" id="ev-image-hint">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <p>Click to upload or drag an image here</p>
+          <span>JPG, PNG, WEBP — resized automatically</span>
+        </div>
+        <div class="image-preview-wrap" id="ev-image-preview-wrap">
+          <img id="ev-image-preview-img" src="" alt="Preview" />
+          <button type="button" class="image-preview-remove" onclick="clearEventImage(event)" title="Remove image">✕</button>
+        </div>
+      </div>
     </div>
     <div class="modal-error" id="event-modal-error"></div>
     <div class="modal-actions">
@@ -1218,9 +1331,9 @@ function renderRSVPTable() {
         <td><strong>${escHtml(name)}</strong></td>
         <td style="color:var(--muted)">${escHtml(r.eventName || '')}</td>
         <td><span class="badge ${r.status || 'pending'}">${statusLabel}</span></td>
-        <td style="color:var(--muted)">${count}</td>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:0.78rem">${escHtml(r.message || '–')}</td>
-        <td style="color:var(--muted);font-size:0.78rem;white-space:nowrap">${ts}</td>
+        <td class="col-hide-sm" style="color:var(--muted)">${count}</td>
+        <td class="col-hide-md" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:0.78rem">${escHtml(r.message || '–')}</td>
+        <td class="col-hide-md" style="color:var(--muted);font-size:0.78rem;white-space:nowrap">${ts}</td>
       </tr>
     `);
   });
@@ -1252,8 +1365,8 @@ function renderGuestTable() {
           <strong>${escHtml(g.name)}</strong>
           ${g.note ? `<br><span style="font-size:0.74rem;color:var(--muted)">${escHtml(g.note)}</span>` : ''}
         </td>
-        <td style="color:var(--muted)">${g.partySize || 1}</td>
-        <td style="font-size:0.78rem;color:var(--muted)">${escHtml(eventNames) || '–'}</td>
+        <td class="col-hide-sm" style="color:var(--muted)">${g.partySize || 1}</td>
+        <td class="col-hide-md" style="font-size:0.78rem;color:var(--muted)">${escHtml(eventNames) || '–'}</td>
         <td>
           <div class="link-cell">
             <span class="link-text" title="${escHtml(link)}">${escHtml(link)}</span>
@@ -1288,9 +1401,9 @@ function renderEventTable() {
           ${ev.description ? `<br><span style="font-size:0.74rem;color:var(--muted)">${escHtml(ev.description)}</span>` : ''}
         </td>
         <td style="color:var(--muted);white-space:nowrap">${escHtml(ev.date || '–')}</td>
-        <td style="color:var(--muted);white-space:nowrap">${escHtml(ev.time || '–')}</td>
-        <td>${escHtml(ev.venue || '–')}</td>
-        <td style="font-size:0.78rem;color:var(--muted)">${escHtml(ev.address || '–')}</td>
+        <td class="col-hide-sm" style="color:var(--muted);white-space:nowrap">${escHtml(ev.time || '–')}</td>
+        <td class="col-hide-md">${escHtml(ev.venue || '–')}</td>
+        <td class="col-hide-md" style="font-size:0.78rem;color:var(--muted)">${escHtml(ev.address || '–')}</td>
       </tr>
     `);
   });
@@ -1393,28 +1506,122 @@ function openAddEvent() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // Reset image upload state
+  document.getElementById('ev-image-file').value = '';
+  document.getElementById('ev-image-hint').style.display = 'block';
+  document.getElementById('ev-image-preview-wrap').style.display = 'none';
+  document.getElementById('ev-image-preview-img').src = '';
   document.getElementById('event-modal-error').style.display = 'none';
   document.getElementById('modal-event').classList.add('open');
+}
+
+// ---- Image upload helpers ----
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('ev-image-drop').classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  document.getElementById('ev-image-drop').classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('ev-image-drop').classList.remove('drag-over');
+  const file = e.dataTransfer?.files?.[0];
+  if (file && file.type.startsWith('image/')) {
+    showImagePreview(file);
+  }
+}
+
+function handleImageSelect(e) {
+  const file = e.target.files?.[0];
+  if (file) showImagePreview(file);
+}
+
+function showImagePreview(file) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('ev-image-preview-img').src = ev.target.result;
+    document.getElementById('ev-image-hint').style.display = 'none';
+    document.getElementById('ev-image-preview-wrap').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearEventImage(e) {
+  e.stopPropagation();
+  document.getElementById('ev-image-file').value = '';
+  document.getElementById('ev-image-preview-img').src = '';
+  document.getElementById('ev-image-hint').style.display = 'block';
+  document.getElementById('ev-image-preview-wrap').style.display = 'none';
+}
+
+async function resizeImageToBase64(file, maxDim) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else { width = Math.round(width * maxDim / height); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = url;
+  });
 }
 
 async function saveEvent() {
   const name  = document.getElementById('ev-name').value.trim();
   const errEl = document.getElementById('event-modal-error');
+  const saveBtn = document.querySelector('#modal-event .modal-actions .action-btn:not(.outline)');
   if (!name) { errEl.textContent = 'Event name is required.'; errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
 
-  const params = {
+  // Handle image upload
+  let imageBase64 = '';
+  let imageMimeType = '';
+  const imgFile = document.getElementById('ev-image-file').files?.[0];
+  if (imgFile) {
+    saveBtn.textContent = 'Uploading image…';
+    saveBtn.disabled = true;
+    try {
+      const dataUrl = await resizeImageToBase64(imgFile, 1400);
+      const [prefix, data] = dataUrl.split(',');
+      imageBase64  = data;
+      imageMimeType = prefix.split(':')[1].split(';')[0];
+    } catch (err) {
+      errEl.textContent = 'Image processing failed. Try a smaller image.';
+      errEl.style.display = 'block';
+      saveBtn.textContent = 'Save Event';
+      saveBtn.disabled = false;
+      return;
+    }
+  }
+
+  if (saveBtn) { saveBtn.textContent = 'Saving…'; saveBtn.disabled = true; }
+
+  const payload = {
+    action:      'addEvent',
+    token,
     name,
     date:        document.getElementById('ev-date').value.trim(),
     time:        document.getElementById('ev-time').value.trim(),
     venue:       document.getElementById('ev-venue').value.trim(),
     address:     document.getElementById('ev-address').value.trim(),
     description: document.getElementById('ev-desc').value.trim(),
-    token,
+    imageBase64,
+    imageMimeType,
   };
 
   try {
-    const res = await apiFetch(`?action=addEvent&${new URLSearchParams(params)}`);
+    const res = await apiFetch('', { method: 'POST', body: JSON.stringify(payload) });
     if (res.success) {
       closeModal('modal-event');
       showToast('Event added!');
@@ -1427,6 +1634,8 @@ async function saveEvent() {
   } catch (err) {
     errEl.textContent = 'Error connecting to backend.';
     errEl.style.display = 'block';
+  } finally {
+    if (saveBtn) { saveBtn.textContent = 'Save Event'; saveBtn.disabled = false; }
   }
 }
 
