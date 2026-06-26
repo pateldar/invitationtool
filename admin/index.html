@@ -1020,6 +1020,7 @@
                   <th class="col-hide-sm">Time</th>
                   <th class="col-hide-md">Venue</th>
                   <th class="col-hide-md">Address</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="event-table-body"></tbody>
@@ -1075,7 +1076,7 @@
 <div class="modal-overlay" id="modal-event">
   <div class="modal">
     <div class="modal-header">
-      <h2>Add Event</h2>
+      <h2 id="event-modal-title">Add Event</h2>
       <button class="modal-close" onclick="closeModal('modal-event')" aria-label="Close">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -1128,7 +1129,7 @@
     <div class="modal-error" id="event-modal-error"></div>
     <div class="modal-actions">
       <button class="action-btn outline" onclick="closeModal('modal-event')">Cancel</button>
-      <button class="action-btn" onclick="saveEvent()">Save Event</button>
+      <button class="action-btn" id="event-save-btn" onclick="saveEvent()">Save Event</button>
     </div>
   </div>
 </div>
@@ -1389,11 +1390,12 @@ function renderEventTable() {
   tbody.innerHTML = '';
 
   if (allEvents.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No events yet — add your first event!</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No events yet — add your first event!</td></tr>';
     return;
   }
 
   allEvents.forEach(ev => {
+    eventDataMap[ev.id] = ev;
     tbody.insertAdjacentHTML('beforeend', `
       <tr>
         <td>
@@ -1404,9 +1406,20 @@ function renderEventTable() {
         <td class="col-hide-sm" style="color:var(--muted);white-space:nowrap">${escHtml(ev.time || '–')}</td>
         <td class="col-hide-md">${escHtml(ev.venue || '–')}</td>
         <td class="col-hide-md" style="font-size:0.78rem;color:var(--muted)">${escHtml(ev.address || '–')}</td>
+        <td style="white-space:nowrap">
+          <button class="action-btn outline" onclick="openEditEvent('${escAttr(ev.id)}')">Edit</button>
+          <button class="action-btn danger" style="margin-left:6px" onclick="deleteEvent('${escAttr(ev.id)}')">Delete</button>
+        </td>
       </tr>
     `);
   });
+}
+
+async function deleteEvent(id) {
+  if (!confirm('Delete this event? Guests invited to it will no longer see it on their invite.')) return;
+  const res = await apiFetch(`?action=deleteEvent&id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`);
+  if (res.success) { showToast('Event deleted.'); await loadAll(); }
+  else showToast('Error deleting event.', true);
 }
 
 // ============================================================
@@ -1501,18 +1514,56 @@ async function deleteGuest(code) {
 // ============================================================
 // Add Event Modal
 // ============================================================
+// Track edit state
+let eventEditId = null;
+let eventEditExistingImageUrl = '';
+let eventImageCleared = false;
+const eventDataMap = {};
+
 function openAddEvent() {
+  eventEditId = null;
+  eventEditExistingImageUrl = '';
+  eventImageCleared = false;
+  document.getElementById('event-modal-title').textContent = 'Add Event';
+  document.getElementById('event-save-btn').textContent = 'Save Event';
   ['ev-name','ev-date','ev-time','ev-venue','ev-address','ev-desc'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  // Reset image upload state
+  resetImageUpload();
+  document.getElementById('event-modal-error').style.display = 'none';
+  document.getElementById('modal-event').classList.add('open');
+}
+
+function openEditEvent(id) {
+  const ev = eventDataMap[id];
+  if (!ev) return;
+  eventEditId = ev.id;
+  eventEditExistingImageUrl = ev.imageUrl || '';
+  eventImageCleared = false;
+  document.getElementById('event-modal-title').textContent = 'Edit Event';
+  document.getElementById('event-save-btn').textContent = 'Save Changes';
+  document.getElementById('ev-name').value    = ev.name        || '';
+  document.getElementById('ev-date').value    = ev.date        || '';
+  document.getElementById('ev-time').value    = ev.time        || '';
+  document.getElementById('ev-venue').value   = ev.venue       || '';
+  document.getElementById('ev-address').value = ev.address     || '';
+  document.getElementById('ev-desc').value    = ev.description || '';
+  resetImageUpload();
+  if (ev.imageUrl) {
+    document.getElementById('ev-image-preview-img').src = ev.imageUrl;
+    document.getElementById('ev-image-hint').style.display = 'none';
+    document.getElementById('ev-image-preview-wrap').style.display = 'block';
+  }
+  document.getElementById('event-modal-error').style.display = 'none';
+  document.getElementById('modal-event').classList.add('open');
+}
+
+function resetImageUpload() {
   document.getElementById('ev-image-file').value = '';
   document.getElementById('ev-image-hint').style.display = 'block';
   document.getElementById('ev-image-preview-wrap').style.display = 'none';
   document.getElementById('ev-image-preview-img').src = '';
-  document.getElementById('event-modal-error').style.display = 'none';
-  document.getElementById('modal-event').classList.add('open');
 }
 
 // ---- Image upload helpers ----
@@ -1551,10 +1602,8 @@ function showImagePreview(file) {
 
 function clearEventImage(e) {
   e.stopPropagation();
-  document.getElementById('ev-image-file').value = '';
-  document.getElementById('ev-image-preview-img').src = '';
-  document.getElementById('ev-image-hint').style.display = 'block';
-  document.getElementById('ev-image-preview-wrap').style.display = 'none';
+  eventImageCleared = true;
+  resetImageUpload();
 }
 
 async function resizeImageToBase64(file, maxDim) {
@@ -1607,9 +1656,16 @@ async function saveEvent() {
 
   if (saveBtn) { saveBtn.textContent = 'Saving…'; saveBtn.disabled = true; }
 
+  // Resolve imageUrl for edit mode
+  let resolvedImageUrl = undefined;
+  if (!imageBase64) {
+    resolvedImageUrl = eventImageCleared ? '' : eventEditExistingImageUrl;
+  }
+
   const payload = {
-    action:      'addEvent',
+    action:      eventEditId ? 'updateEvent' : 'addEvent',
     token,
+    id:          eventEditId || undefined,
     name,
     date:        document.getElementById('ev-date').value.trim(),
     time:        document.getElementById('ev-time').value.trim(),
@@ -1618,13 +1674,14 @@ async function saveEvent() {
     description: document.getElementById('ev-desc').value.trim(),
     imageBase64,
     imageMimeType,
+    imageUrl:    resolvedImageUrl,
   };
 
   try {
     const res = await apiFetch('', { method: 'POST', body: JSON.stringify(payload) });
     if (res.success) {
       closeModal('modal-event');
-      showToast('Event added!');
+      showToast(eventEditId ? 'Event updated!' : 'Event added!');
       await loadAll();
       switchPanel('events', document.querySelector('[data-panel="events"]'));
     } else {
