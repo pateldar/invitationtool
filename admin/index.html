@@ -1050,9 +1050,15 @@
       <label>Email (optional)</label>
       <input type="email" id="g-email" placeholder="guest@email.com" />
     </div>
-    <div class="form-field">
-      <label>Party Size (max guests on this invite)</label>
-      <input type="number" id="g-size" min="1" max="20" value="1" />
+    <div class="form-field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Adults</label>
+        <input type="number" id="g-adults" min="1" max="20" value="1" />
+      </div>
+      <div>
+        <label>Children <span style="opacity:0.55;font-size:0.7rem">(optional)</span></label>
+        <input type="number" id="g-children" min="0" max="20" value="0" />
+      </div>
     </div>
     <div class="form-field">
       <label>Invited to Events</label>
@@ -1255,14 +1261,22 @@ function renderAll() {
 // ============================================================
 // Stats
 // ============================================================
+function guestAdults(g)   { return parseInt(g.adults)   || parseInt(g.partySize) || 1; }
+function guestChildren(g) { return parseInt(g.children) || 0; }
+function guestTotal(g)    { return guestAdults(g) + guestChildren(g); }
+function guestCountLabel(g) {
+  const a = guestAdults(g), c = guestChildren(g);
+  if (c === 0) return `${a} adult${a !== 1 ? 's' : ''}`;
+  return `${a}a · ${c}c`;
+}
+
 function renderStats() {
-  const guestSizeMap   = {};
-  allGuests.forEach(g => { guestSizeMap[g.code] = parseInt(g.partySize) || 1; });
+  const guestSizeMap = {};
+  allGuests.forEach(g => { guestSizeMap[g.code] = guestTotal(g); });
 
   const respondedCodes = new Set(allRSVPs.map(r => r.guestCode));
   const noCodes        = new Set(allRSVPs.filter(r => r.status === 'not_going').map(r => r.guestCode));
 
-  // Sum attendingCount for going/maybe RSVPs (per-event headcounts)
   const goingTotal = allRSVPs
     .filter(r => r.status === 'going')
     .reduce((sum, r) => sum + (parseInt(r.attendingCount) || guestSizeMap[r.guestCode] || 1), 0);
@@ -1270,15 +1284,14 @@ function renderStats() {
     .filter(r => r.status === 'maybe')
     .reduce((sum, r) => sum + (parseInt(r.attendingCount) || guestSizeMap[r.guestCode] || 1), 0);
 
-  // Total invited = sum of party sizes
-  const totalInvited = allGuests.reduce((sum, g) => sum + (parseInt(g.partySize) || 1), 0);
+  const totalAdults   = allGuests.reduce((sum, g) => sum + guestAdults(g),   0);
+  const totalChildren = allGuests.reduce((sum, g) => sum + guestChildren(g), 0);
+  const totalInvited  = totalAdults + totalChildren;
 
-  // Pending = sum of party sizes for guests who haven't responded at all
   const pendingTotal = allGuests
     .filter(g => !respondedCodes.has(g.code))
-    .reduce((sum, g) => sum + (parseInt(g.partySize) || 1), 0);
+    .reduce((sum, g) => sum + guestTotal(g), 0);
 
-  // Can't go = sum of party sizes for guests with only not_going responses
   const noTotal = [...noCodes].reduce((sum, code) => sum + (guestSizeMap[code] || 1), 0);
 
   document.getElementById('stat-total').textContent   = totalInvited;
@@ -1286,6 +1299,19 @@ function renderStats() {
   document.getElementById('stat-maybe').textContent   = maybeTotal;
   document.getElementById('stat-no').textContent      = noTotal;
   document.getElementById('stat-pending').textContent = pendingTotal;
+
+  // Adult/child breakdown sub-label under Total Invited
+  const breakdown = totalChildren > 0
+    ? `${totalAdults} adults · ${totalChildren} children`
+    : `${totalAdults} adults`;
+  let subEl = document.getElementById('stat-total-breakdown');
+  if (!subEl) {
+    subEl = document.createElement('div');
+    subEl.id = 'stat-total-breakdown';
+    subEl.style.cssText = 'font-size:0.68rem;color:var(--muted);margin-top:4px;letter-spacing:0.04em';
+    document.getElementById('stat-total').insertAdjacentElement('afterend', subEl);
+  }
+  subEl.textContent = breakdown;
 }
 
 // ============================================================
@@ -1385,7 +1411,7 @@ function renderGuestTable() {
           <strong>${escHtml(g.name)}</strong>
           ${g.note ? `<br><span style="font-size:0.74rem;color:var(--muted)">${escHtml(g.note)}</span>` : ''}
         </td>
-        <td class="col-hide-sm" style="color:var(--muted)">${g.partySize || 1}</td>
+        <td class="col-hide-sm" style="color:var(--muted)">${guestCountLabel(g)}</td>
         <td class="col-hide-md" style="font-size:0.78rem;color:var(--muted)">${escHtml(eventNames) || '–'}</td>
         <td>
           <div class="link-cell">
@@ -1492,7 +1518,8 @@ function openAddGuest() {
 async function saveGuest() {
   const name     = document.getElementById('g-name').value.trim();
   const email    = document.getElementById('g-email').value.trim();
-  const size     = document.getElementById('g-size').value;
+  const adults   = parseInt(document.getElementById('g-adults').value) || 1;
+  const children = parseInt(document.getElementById('g-children').value) || 0;
   const note     = document.getElementById('g-note').value.trim();
   const errEl    = document.getElementById('guest-modal-error');
 
@@ -1506,7 +1533,7 @@ async function saveGuest() {
   try {
     const res = await apiFetch('', {
       method: 'POST',
-      body: JSON.stringify({ action: 'addGuest', token, name, email, partySize: size, eventIds, note })
+      body: JSON.stringify({ action: 'addGuest', token, name, email, adults, children, partySize: adults + children, eventIds, note })
     });
     if (res.success) {
       closeModal('modal-guest');

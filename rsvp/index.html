@@ -714,12 +714,17 @@ function renderInvite() {
       eventList.appendChild(card);
 
       // RSVP block
-      const maxGuests = parseInt(guestData.partySize) || 1;
-      const existing  = existingRSVPs[ev.id];
-      const initStatus = existing ? existing.status : null;
-      const initCount  = existing ? (parseInt(existing.attendingCount) || 1) : 1;
+      const maxAdults   = parseInt(guestData.adults)   || parseInt(guestData.partySize) || 1;
+      const maxChildren = parseInt(guestData.children) || 0;
+      const hasChildren = maxChildren > 0;
+      const existing    = existingRSVPs[ev.id];
+      const initStatus  = existing ? existing.status : null;
+      const initAdults  = existing ? (parseInt(existing.attendingAdults)   || maxAdults)   : maxAdults;
+      const initKids    = existing ? (parseInt(existing.attendingChildren) || maxChildren) : maxChildren;
 
-      rsvpState[ev.id] = { status: initStatus, count: initCount };
+      rsvpState[ev.id] = { status: initStatus, adults: initAdults, children: initKids };
+
+      const showCounts = initStatus === 'going' || initStatus === 'maybe';
 
       const block = document.createElement('div');
       block.className = 'rsvp-event-block';
@@ -730,22 +735,34 @@ function renderInvite() {
           ${rsvpChoice(ev.id, 'maybe',     ICONS.maybe, 'Maybe',    initStatus === 'maybe')}
           ${rsvpChoice(ev.id, 'not_going', ICONS.xmark, "Can't Go", initStatus === 'not_going')}
         </div>
-        ${maxGuests > 1 ? `
-        <div class="attending-row" id="count-row-${ev.id}" style="display:${(initStatus === 'going' || initStatus === 'maybe') ? 'flex' : 'none'}">
-          <label>How many from your party?</label>
-          <div class="qty-control">
-            <button type="button" class="qty-btn" onclick="changeCount('${ev.id}',-1)">−</button>
-            <div class="qty-val" id="count-val-${ev.id}">${initCount}</div>
-            <button type="button" class="qty-btn" onclick="changeCount('${ev.id}',1)">+</button>
-          </div>
-          <span class="qty-max">of ${maxGuests}</span>
-        </div>` : ''}
+        <div id="count-row-${ev.id}" style="display:${showCounts ? 'block' : 'none'}">
+          ${maxAdults > 1 || hasChildren ? `
+          <div class="attending-row">
+            <label>Adults attending</label>
+            <div class="qty-control">
+              <button type="button" class="qty-btn" onclick="changeCount('${ev.id}','adults',-1)">−</button>
+              <div class="qty-val" id="count-adults-${ev.id}">${initAdults}</div>
+              <button type="button" class="qty-btn" onclick="changeCount('${ev.id}','adults',1)">+</button>
+            </div>
+            <span class="qty-max">of ${maxAdults}</span>
+          </div>` : ''}
+          ${hasChildren ? `
+          <div class="attending-row">
+            <label>Children attending</label>
+            <div class="qty-control">
+              <button type="button" class="qty-btn" onclick="changeCount('${ev.id}','children',-1)">−</button>
+              <div class="qty-val" id="count-children-${ev.id}">${initKids}</div>
+              <button type="button" class="qty-btn" onclick="changeCount('${ev.id}','children',1)">+</button>
+            </div>
+            <span class="qty-max">of ${maxChildren}</span>
+          </div>` : ''}
+        </div>
       `;
       rsvpContainer.appendChild(block);
 
       // Wire up radio change
       block.querySelectorAll('input[type="radio"]').forEach(input => {
-        input.addEventListener('change', () => onRSVPChange(ev.id, maxGuests));
+        input.addEventListener('change', () => onRSVPChange(ev.id));
       });
     });
   }
@@ -775,23 +792,26 @@ function rsvpChoice(eventId, value, iconSvg, label, checked) {
 // ============================================================
 // Interactions
 // ============================================================
-function onRSVPChange(eventId, maxGuests) {
+function onRSVPChange(eventId) {
   const selected = document.querySelector(`input[name="rsvp-${eventId}"]:checked`);
   if (!selected) return;
   rsvpState[eventId].status = selected.value;
 
   const countRow = document.getElementById(`count-row-${eventId}`);
   if (countRow) {
-    countRow.style.display = (selected.value === 'going' || selected.value === 'maybe') ? 'flex' : 'none';
+    countRow.style.display = (selected.value === 'going' || selected.value === 'maybe') ? 'block' : 'none';
   }
 }
 
-function changeCount(eventId, delta) {
-  const maxGuests = parseInt(guestData.partySize) || 1;
-  const current   = rsvpState[eventId].count;
-  const next      = Math.max(1, Math.min(maxGuests, current + delta));
-  rsvpState[eventId].count = next;
-  const el = document.getElementById(`count-val-${eventId}`);
+function changeCount(eventId, type, delta) {
+  const maxAdults   = parseInt(guestData.adults)   || parseInt(guestData.partySize) || 1;
+  const maxChildren = parseInt(guestData.children) || 0;
+  const max = type === 'children' ? maxChildren : maxAdults;
+  const min = type === 'children' ? 0 : 1;
+  const current = rsvpState[eventId][type];
+  const next    = Math.max(min, Math.min(max, current + delta));
+  rsvpState[eventId][type] = next;
+  const el = document.getElementById(`count-${type}-${eventId}`);
   if (el) el.textContent = next;
 }
 
@@ -836,13 +856,21 @@ async function submitRSVP() {
   btn.textContent = 'Sending…';
 
   const message = document.getElementById('guest-message').value.trim();
-  const rsvps = events.map(ev => ({
-    eventId:        ev.id,
-    eventName:      ev.name,
-    status:         rsvpState[ev.id].status,
-    attendingCount: (rsvpState[ev.id].status === 'going' || rsvpState[ev.id].status === 'maybe') ? (rsvpState[ev.id].count || 1) : 0,
-    message,
-  }));
+  const rsvps = events.map(ev => {
+    const st = rsvpState[ev.id];
+    const attending = st.status === 'going' || st.status === 'maybe';
+    const adults   = attending ? (st.adults   || 1) : 0;
+    const children = attending ? (st.children || 0) : 0;
+    return {
+      eventId:           ev.id,
+      eventName:         ev.name,
+      status:            st.status,
+      attendingCount:    adults + children,
+      attendingAdults:   adults,
+      attendingChildren: children,
+      message,
+    };
+  });
 
   try {
     const res = await apiFetch('', {
