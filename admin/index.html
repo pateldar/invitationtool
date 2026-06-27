@@ -1510,7 +1510,8 @@ function openAddGuest() {
   }
 
   ['g-name','g-email','g-note'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('g-size').value = 1;
+  document.getElementById('g-adults').value   = 1;
+  document.getElementById('g-children').value = 0;
   document.getElementById('guest-modal-error').style.display = 'none';
   document.getElementById('modal-guest').classList.add('open');
 }
