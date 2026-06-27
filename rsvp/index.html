@@ -573,6 +573,11 @@
             <input type="text" id="guest-name" placeholder="Full name" autocomplete="name" />
           </div>
 
+          <div class="field-group">
+            <label for="guest-email">Email Address</label>
+            <input type="email" id="guest-email" placeholder="you@example.com" autocomplete="email" required />
+          </div>
+
           <!-- Per-event RSVP blocks injected here -->
           <div id="rsvp-events-container"></div>
 
@@ -666,8 +671,9 @@ function renderInvite() {
   document.getElementById('guest-greeting').innerHTML =
     `Dear <strong style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1em;font-weight:400">${escHtml(name)}</strong>,<br>We joyfully request your presence at our upcoming celebration.`;
 
-  // Prefill name
-  document.getElementById('guest-name').value = name;
+  // Prefill name and email
+  document.getElementById('guest-name').value  = name;
+  document.getElementById('guest-email').value = guestData.email || '';
 
   // Events list
   const eventList = document.getElementById('event-list');
@@ -808,6 +814,15 @@ async function submitRSVP() {
 
   errEl.style.display = 'none';
 
+  // Validate email
+  const emailEl = document.getElementById('guest-email');
+  if (!emailEl.value.trim() || !emailEl.validity.valid) {
+    errEl.textContent = 'Please enter a valid email address.';
+    errEl.style.display = 'block';
+    emailEl.focus();
+    return;
+  }
+
   // Validate all events have an RSVP
   const missingEvents = events.filter(ev => !rsvpState[ev.id]?.status);
   if (missingEvents.length > 0) {
@@ -836,6 +851,7 @@ async function submitRSVP() {
         action:     'submitRSVP',
         guestCode,
         guestName:  nameEl.value.trim() || guestData.name || '',
+        guestEmail: document.getElementById('guest-email').value.trim(),
         message:    document.getElementById('guest-message').value.trim(),
         rsvps
       })
