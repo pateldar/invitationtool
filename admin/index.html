@@ -1256,17 +1256,36 @@ function renderAll() {
 // Stats
 // ============================================================
 function renderStats() {
-  const respondedCodes = new Set(allRSVPs.map(r => r.guestCode));
-  const goingCodes     = new Set(allRSVPs.filter(r => r.status === 'going').map(r => r.guestCode));
-  const maybeCodes     = new Set(allRSVPs.filter(r => r.status === 'maybe').map(r => r.guestCode));
-  const noCodes        = new Set(allRSVPs.filter(r => r.status === 'not_going').map(r => r.guestCode));
-  const pendingCount   = allGuests.filter(g => !respondedCodes.has(g.code)).length;
+  const guestSizeMap   = {};
+  allGuests.forEach(g => { guestSizeMap[g.code] = parseInt(g.partySize) || 1; });
 
-  document.getElementById('stat-total').textContent   = allGuests.length;
-  document.getElementById('stat-going').textContent   = goingCodes.size;
-  document.getElementById('stat-maybe').textContent   = maybeCodes.size;
-  document.getElementById('stat-no').textContent      = noCodes.size;
-  document.getElementById('stat-pending').textContent = pendingCount;
+  const respondedCodes = new Set(allRSVPs.map(r => r.guestCode));
+  const noCodes        = new Set(allRSVPs.filter(r => r.status === 'not_going').map(r => r.guestCode));
+
+  // Sum attendingCount for going/maybe RSVPs (per-event headcounts)
+  const goingTotal = allRSVPs
+    .filter(r => r.status === 'going')
+    .reduce((sum, r) => sum + (parseInt(r.attendingCount) || guestSizeMap[r.guestCode] || 1), 0);
+  const maybeTotal = allRSVPs
+    .filter(r => r.status === 'maybe')
+    .reduce((sum, r) => sum + (parseInt(r.attendingCount) || guestSizeMap[r.guestCode] || 1), 0);
+
+  // Total invited = sum of party sizes
+  const totalInvited = allGuests.reduce((sum, g) => sum + (parseInt(g.partySize) || 1), 0);
+
+  // Pending = sum of party sizes for guests who haven't responded at all
+  const pendingTotal = allGuests
+    .filter(g => !respondedCodes.has(g.code))
+    .reduce((sum, g) => sum + (parseInt(g.partySize) || 1), 0);
+
+  // Can't go = sum of party sizes for guests with only not_going responses
+  const noTotal = [...noCodes].reduce((sum, code) => sum + (guestSizeMap[code] || 1), 0);
+
+  document.getElementById('stat-total').textContent   = totalInvited;
+  document.getElementById('stat-going').textContent   = goingTotal;
+  document.getElementById('stat-maybe').textContent   = maybeTotal;
+  document.getElementById('stat-no').textContent      = noTotal;
+  document.getElementById('stat-pending').textContent = pendingTotal;
 }
 
 // ============================================================
@@ -1544,7 +1563,7 @@ function openEditEvent(id) {
   document.getElementById('event-modal-title').textContent = 'Edit Event';
   document.getElementById('event-save-btn').textContent = 'Save Changes';
   document.getElementById('ev-name').value    = ev.name        || '';
-  document.getElementById('ev-date').value    = ev.date        || '';
+  document.getElementById('ev-date').value    = ev.date ? String(ev.date).slice(0, 10) : '';
   document.getElementById('ev-time').value    = ev.time        || '';
   document.getElementById('ev-venue').value   = ev.venue       || '';
   document.getElementById('ev-address').value = ev.address     || '';
